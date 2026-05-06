@@ -17,8 +17,9 @@ struct TamaState {
   uint8_t  nLines;
   uint16_t lineGen;          // bumps when lines change — lets UI reset scroll
   char     promptId[40];     // pending permission request ID; empty = no prompt
-  char     promptTool[20];
-  char     promptHint[44];
+  char     promptTool[48];   // tool name as sent by desktop; bumped from 20 so
+                             // long names like "Chrome get_current_tab" survive
+  char     promptHint[64];   // hint text; bumped from 44 to match
 };
 
 // ---------------------------------------------------------------------------

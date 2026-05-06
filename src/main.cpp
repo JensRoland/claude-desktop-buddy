@@ -440,6 +440,9 @@ void loop() {
       promptArrivedMs = millis();
       wake();
       beep(1200, 80);
+      Serial.printf("[prompt] tool=[%s] (len=%u) hint=[%s]\n",
+                    tama.promptTool, (unsigned)strlen(tama.promptTool),
+                    tama.promptHint);
     }
   }
 
