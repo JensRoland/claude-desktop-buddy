@@ -469,36 +469,27 @@ void loop() {
     else { M5.Axp.SetLDO2(false); screenOff = true; }
   }
 
-  // BtnA = approve when in prompt, else scroll transcript backward.
-  if (M5.BtnA.wasReleased()) {
-    if (inPrompt) {
-      char cmd[96];
-      snprintf(cmd, sizeof(cmd),
-               "{\"cmd\":\"permission\",\"id\":\"%s\",\"decision\":\"once\"}",
-               tama.promptId);
-      sendCmd(cmd);
-      responseSent = true;
-      beep(2400, 60);
-    } else {
-      msgScroll = (msgScroll >= 30) ? 0 : msgScroll + 3;
-      beep(1800, 30);
-    }
+  // BtnA = approve when in prompt; otherwise no action (transcript view
+  // is currently disabled, so nothing to scroll).
+  if (M5.BtnA.wasReleased() && inPrompt) {
+    char cmd[96];
+    snprintf(cmd, sizeof(cmd),
+             "{\"cmd\":\"permission\",\"id\":\"%s\",\"decision\":\"once\"}",
+             tama.promptId);
+    sendCmd(cmd);
+    responseSent = true;
+    beep(2400, 60);
   }
 
-  // BtnB = deny when in prompt, else reset scroll to newest.
-  if (M5.BtnB.wasPressed()) {
-    if (inPrompt) {
-      char cmd[96];
-      snprintf(cmd, sizeof(cmd),
-               "{\"cmd\":\"permission\",\"id\":\"%s\",\"decision\":\"deny\"}",
-               tama.promptId);
-      sendCmd(cmd);
-      responseSent = true;
-      beep(600, 60);
-    } else if (msgScroll > 0) {
-      msgScroll = 0;
-      beep(1800, 30);
-    }
+  // BtnB = deny when in prompt; otherwise no action.
+  if (M5.BtnB.wasPressed() && inPrompt) {
+    char cmd[96];
+    snprintf(cmd, sizeof(cmd),
+             "{\"cmd\":\"permission\",\"id\":\"%s\",\"decision\":\"deny\"}",
+             tama.promptId);
+    sendCmd(cmd);
+    responseSent = true;
+    beep(600, 60);
   }
 
   // LED pulses while waiting for a response — the wrist-glance "look at me".
@@ -517,7 +508,6 @@ void loop() {
     if (pk)                          drawPasskey();
     else if (tama.promptId[0])       drawApproval();    // covers in-prompt and "sent..."
     else if (!tama.connected)        drawDisconnected();
-    else if (historyCount > 0)       drawTranscript();
     else                             drawIdle();
     spr.pushSprite(0, 0);
   }
