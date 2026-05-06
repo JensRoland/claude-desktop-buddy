@@ -83,8 +83,6 @@ static void _applyJson(const char* line, TamaState* out) {
                            (uint8_t)lt.tm_mday, (uint16_t)(lt.tm_year + 1900) };
     M5.Rtc.SetTime(&tm);
     M5.Rtc.SetDate(&dt);
-    extern uint32_t _clkLastRead;
-    _clkLastRead = 0;   // force re-read so _clkDt and _rtcValid agree
     _rtcValid = true;
     _lastLiveMs = millis();
     return;
@@ -94,8 +92,6 @@ static void _applyJson(const char* line, TamaState* out) {
   out->sessionsRunning   = doc["running"]   | out->sessionsRunning;
   out->sessionsWaiting   = doc["waiting"]   | out->sessionsWaiting;
   out->recentlyCompleted = doc["completed"] | false;
-  uint32_t bridgeTokens = doc["tokens"] | 0;
-  if (doc["tokens"].is<uint32_t>()) statsOnBridgeTokens(bridgeTokens);
   out->tokensToday = doc["tokens_today"] | out->tokensToday;
   const char* m = doc["msg"];
   if (m) { strncpy(out->msg, m, sizeof(out->msg)-1); out->msg[sizeof(out->msg)-1]=0; }
